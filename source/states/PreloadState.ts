@@ -13,17 +13,23 @@ class PreloadState implements State {
   }
 
   enter(): void {
-    console.log("Preload - enter");
+    let that = this;
+
     this.loadQueue.loadManifest("../../../assets/manifest.json");
-    this.loadQueue.on("complete", this.handleComplete);
+    this.loadQueue.on("complete", ()=>(that.handleComplete()));
   }
 
   exit(): void {
-    console.log("Preload - exit");
+
   }
 
   handleComplete(): void {
-    console.log("Preload - handleComplete");
+    for(let asset of this.loadQueue.getItems(false)) {
+      if (asset['item']['type'] != 'manifest') {
+        Game.assets[asset['item']['id']] = asset['result'];
+      }
+    }
+
     Game.nextState();
   }
 }

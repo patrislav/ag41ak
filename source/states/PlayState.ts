@@ -19,6 +19,11 @@ class PlayState implements State {
     circle.y = 100;
     Game.stage.addChild(circle);
 
+    let bitmap = new createjs.Bitmap(Game.assets['player']);
+    bitmap.x = 100 - bitmap.image.width/2;
+    bitmap.y = 100 - bitmap.image.height/2;
+    Game.stage.addChild(bitmap);
+
     Game.stage.update();
   }
 

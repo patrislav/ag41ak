@@ -15,6 +15,8 @@ export let stage: createjs.Stage;
 export let states: State[];
 export let currentState: State;
 
+export let assets: Object = {};
+
 
 // Public functions
 export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
