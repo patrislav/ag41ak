@@ -1,12 +1,10 @@
-
 import Entity = require('../Entity');
+import Game = require('../Game');
+import Util = require('../Util');
 
-class Bullet extends Entity {
+class Enemy extends Entity {
 
-  static SPEED = 350;
-  static RADIUS = 4;
-
-  shooter: Entity;
+  static SIZE = 50;
 
   shape: createjs.Shape;
 
@@ -14,9 +12,12 @@ class Bullet extends Entity {
     super();
 
     this.shape = new createjs.Shape();
-    this.shape.graphics.beginFill('#ffffff').drawCircle(0, 0, Bullet.RADIUS);
-    this.shape.setBounds(-Bullet.RADIUS, -Bullet.RADIUS, Bullet.RADIUS, Bullet.RADIUS);
+    this.shape.graphics.beginFill('#000000').drawRect(0, 0, Enemy.SIZE, Enemy.SIZE);
+    this.shape.setBounds(0, 0, Enemy.SIZE, Enemy.SIZE);
     this.addChild(this.shape);
+
+    this.regX = Enemy.SIZE/2;
+    this.regY = Enemy.SIZE/2;
 
     this.addEventListener("added", ()=>( this.added() ));
   }
@@ -27,8 +28,6 @@ class Bullet extends Entity {
 
   update(event: createjs.TickerEvent) {
     let deltaTime = event.delta / 1000; // convert to seconds
-
-    this.updateMotion(deltaTime);
   }
 
   getDisplayObject(): createjs.DisplayObject {
@@ -37,4 +36,4 @@ class Bullet extends Entity {
 
 }
 
-export = Bullet;
+export = Enemy;

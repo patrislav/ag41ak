@@ -3,12 +3,14 @@ import Entity = require('../Entity');
 import Game = require('../Game');
 import Util = require('../Util');
 import PlayerBullet = require('./PlayerBullet');
+import PlayState = require('../states/PlayState');
 
 class Player extends Entity {
   static SPEED = 175; // px/second
   static SHOOT_COOLDOWN = 0.4; // seconds
 
   bitmap: createjs.Bitmap;
+  state: PlayState;
 
   shootCooldown = 0;
 
@@ -63,11 +65,9 @@ class Player extends Entity {
       if (this.shootCooldown <= 0) {
         let bullet = new PlayerBullet(this);
         this.parent.addChild(bullet);
+        this.state.bullets.push(bullet);
 
         this.shootCooldown = Player.SHOOT_COOLDOWN;
-
-        let instance = createjs.Sound.play("zap-1");
-        console.log(instance.playState);
       }
     }
   }
