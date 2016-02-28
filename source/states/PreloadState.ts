@@ -3,12 +3,13 @@ import $ = require('jquery');
 import State = require('../State');
 import Game = require('../Game');
 
-class PreloadState implements State {
+class PreloadState extends State {
   name: string = "PreloadState";
 
   loadQueue: createjs.LoadQueue;
 
   constructor() {
+    super();
     this.loadQueue = new createjs.LoadQueue(true);
   }
 

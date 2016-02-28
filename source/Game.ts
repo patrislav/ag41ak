@@ -7,6 +7,7 @@
 import _ = require('underscore');
 import $ = require("jquery");
 import State = require("./State");
+import Entity = require("./Entity");
 
 // Public properties
 export let canvas: HTMLElement;
@@ -17,6 +18,7 @@ export let currentState: State;
 
 export let assets: Object = {};
 
+export let keys: Object = {};
 
 // Public functions
 export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
@@ -83,11 +85,52 @@ export function previousState() {
   }
 }
 
+export function addChild(entity: Entity) {
+  stage.addChild(entity);
+}
+
+export function removeChild(entity: Entity) {
+  stage.removeChild(entity);
+}
+
+export function anyPressed(keycodes: number[]): boolean {
+  for (let keycode of keycodes) {
+    if (keys[keycode]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Private functions
 function tick(event: createjs.Event) {
+  // Handle input
+  // window.document.addEventListener("keydown", (event)=>(handleKeydown(event)));
+  window.document.onkeydown = (event: KeyboardEvent)=> handleKeydown(event);
+  window.document.onkeyup = (event: KeyboardEvent)=> handleKeyup(event);
+
+  // Handle the state update
   if (currentState && currentState.update) {
     currentState.update(event);
   }
 
+  // Update the stage
   stage.update();
+}
+
+// Handle input functions
+function handleKeydown(event: KeyboardEvent): boolean {
+  let keycode = event.which || event.keyCode;
+  keys[keycode] = true;
+
+  event.preventDefault();
+  return false;
+}
+
+function handleKeyup(event: KeyboardEvent): boolean {
+  let keycode = event.which || event.keyCode;
+  keys[keycode] = false;
+
+  event.preventDefault();
+  return false;
 }

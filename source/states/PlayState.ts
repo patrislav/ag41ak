@@ -2,29 +2,32 @@
 import $ = require('jquery');
 import State = require('../State');
 import Game = require('../Game');
+import Player = require('../entities/Player');
+import Bullet = require('../entities/Bullet');
 
-class PlayState implements State {
+class PlayState extends State {
   name: string = "PlayState";
 
-  constructor() {
+  player: Player;
 
+  bullets: Bullet[];
+
+  constructor() {
+    super();
   }
 
   enter(): void {
-    console.log("Play - enter");
+    let width = Game.stage.canvas['width'];
+    let height = Game.stage.canvas['height'];
 
-    let circle = new createjs.Shape();
-    circle.graphics.beginFill("#0099ff").drawCircle(0, 0, 50);
-    circle.x = 100;
-    circle.y = 100;
-    Game.stage.addChild(circle);
+    let background = new createjs.Shape();
+    background.graphics.beginFill("#DB7937").drawRect(0, 0, width, height);
+    Game.stage.addChild(background);
 
-    let bitmap = new createjs.Bitmap(Game.assets['player']);
-    bitmap.x = 100 - bitmap.image.width/2;
-    bitmap.y = 100 - bitmap.image.height/2;
-    Game.stage.addChild(bitmap);
-
-    Game.stage.update();
+    this.player = new Player();
+    this.player.x = width/2;
+    this.player.y = height-100;
+    Game.addChild(this.player);
   }
 
   exit(): void {
@@ -32,7 +35,9 @@ class PlayState implements State {
   }
 
   update(event: createjs.Event): void {
-    $('.thing').text(Math.round(createjs.Ticker.getMeasuredFPS()));
+    $('.thing').text("FPS: " + Math.round(createjs.Ticker.getMeasuredFPS()));
+
+    let deltaTime = event.delta / 1000; // event.delta is in ms
   }
 }
 
