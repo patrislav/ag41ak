@@ -2,15 +2,18 @@
 
 import Game = require('./Game');
 import Util = require('./Util');
+import State = require('./State');
 
 class Entity extends createjs.Container {
+
+  updateHandler: (event: createjs.TickerEvent)=>any;
 
   acceleration = new Util.Vector2();
   velocity = new Util.Vector2();
   maxVelocity = new Util.Vector2();
   drag = new Util.Vector2();
 
-  constructor() {
+  constructor(public state: State) {
     super();
   }
 

@@ -1,15 +1,18 @@
+
 import Entity = require('../Entity');
 import Game = require('../Game');
 import Util = require('../Util');
+import PlayState = require('../states/PlayState');
 
 class Enemy extends Entity {
 
   static SIZE = 50;
 
+  state: PlayState;
   shape: createjs.Shape;
 
-  constructor() {
-    super();
+  constructor(state: PlayState) {
+    super(state);
 
     this.shape = new createjs.Shape();
     this.shape.graphics.beginFill('#000000').drawRect(0, 0, Enemy.SIZE, Enemy.SIZE);
@@ -19,11 +22,18 @@ class Enemy extends Entity {
     this.regX = Enemy.SIZE/2;
     this.regY = Enemy.SIZE/2;
 
+    this.updateHandler = (event: createjs.TickerEvent)=> ( this.update(event) );
+
     this.addEventListener("added", ()=>( this.added() ));
+    this.addEventListener("removed", ()=>( this.removed() ));
   }
 
   added() {
-    createjs.Ticker.addEventListener("tick", (event: createjs.TickerEvent)=>( this.update(event) ));
+    createjs.Ticker.addEventListener("tick", this.updateHandler);
+  }
+
+  removed() {
+    createjs.Ticker.removeEventListener("tick", this.updateHandler);
   }
 
   update(event: createjs.TickerEvent) {

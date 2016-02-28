@@ -14,8 +14,8 @@ class Player extends Entity {
 
   shootCooldown = 0;
 
-  constructor() {
-    super();
+  constructor(state: PlayState) {
+    super(state);
     this.bitmap = new createjs.Bitmap(Game.assets['player']);
     this.regX = this.bitmap.image.width/2;
     this.regY = this.bitmap.image.height/2;
@@ -26,14 +26,23 @@ class Player extends Entity {
     this.acceleration.x = 0;
     this.acceleration.y = 0;
 
+    this.updateHandler = (event: createjs.TickerEvent)=> ( this.update(event) );
+
     this.addEventListener("added", ()=>( this.added() ));
+    this.addEventListener("removed", ()=>( this.removed() ));
   }
 
   added() {
-    createjs.Ticker.addEventListener("tick", (event: createjs.TickerEvent)=>( this.update(event) ));
+    createjs.Ticker.addEventListener("tick", this.updateHandler);
+  }
+
+  removed() {
+    createjs.Ticker.removeEventListener("tick", this.updateHandler);
   }
 
   update(event: createjs.TickerEvent) {
+    console.log(event);
+
     let deltaTime = event.delta / 1000; // convert to seconds
 
     this.shootCooldown -= deltaTime;
@@ -63,7 +72,7 @@ class Player extends Entity {
 
     if (Game.anyPressed([32])) { // 32 - space
       if (this.shootCooldown <= 0) {
-        let bullet = new PlayerBullet(this);
+        let bullet = new PlayerBullet(this.state, this);
         this.parent.addChild(bullet);
         this.state.bullets.push(bullet);
 
