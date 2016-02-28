@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "./export/scripts/app",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "noImplicitAny": false
+  },
+  "filesGlob": [
+    "source/**/*.ts",
+    "source/**/*.tsx",
+    "typings/**/*.ts"
+  ],
+  "files": [
+    "source/Boot.ts",
+    "source/entities/Player.ts",
+    "source/Game.ts",
+    "source/Main.ts",
+    "source/State.ts",
+    "typings/createjs-lib/createjs-lib.d.ts",
+    "typings/createjs/createjs.d.ts",
+    "typings/easeljs/easeljs.d.ts",
+    "typings/jquery/jquery.d.ts",
+    "typings/preloadjs/preloadjs.d.ts",
+    "typings/requirejs/require.d.ts",
+    "typings/soundjs/soundjs.d.ts",
+    "typings/tsd.d.ts",
+    "typings/tweenjs/tweenjs.d.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
+}

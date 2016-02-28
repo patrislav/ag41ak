@@ -1,0 +1,8 @@
+
+interface State {
+
+  
+
+}
+
+export = State;
