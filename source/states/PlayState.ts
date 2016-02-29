@@ -54,8 +54,8 @@ class PlayState extends State {
   }
 
   update(event: createjs.Event): void {
-    // $('.thing').text("FPS: " + Math.round(createjs.Ticker.getMeasuredFPS()));
-    $('.thing').text("Bullets: " + this.bullets.length);
+    $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
+    $('.lives-number').text(this.player.health);
 
     let deltaTime = event.delta / 1000; // event.delta is in ms
 
