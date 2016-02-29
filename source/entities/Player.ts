@@ -84,6 +84,7 @@ class Player extends Entity {
           this.state.addBullet(bullet);
         }
 
+        createjs.Sound.play("zap-1");
         this.shootCooldown = Player.SHOOT_COOLDOWN;
       }
     }
@@ -95,8 +96,17 @@ class Player extends Entity {
       this.invulnerable = true;
       this.invulnCooldown = Player.INVULN_TIME;
       this.invulnerabilityEffect();
+
+      createjs.Sound.play("hurt-1", { volume: 1 });
     }
     return res;
+  }
+
+  kill() {
+    super.kill();
+
+    createjs.Sound.play("boom-2", { volume: 1 });
+    createjs.Sound.play("lose-1", { volume: 1, delay: 100 });
   }
 
   invulnerabilityEffect() {

@@ -18,6 +18,8 @@ class PreloadState extends State {
 
     this.loadQueue.loadManifest("../../../assets/manifest.json");
     this.loadQueue.on("complete", ()=>(that.handleComplete()));
+    createjs.Sound.alternateExtensions = ["wav", "mp3"];
+    this.loadQueue.installPlugin(<any>createjs.Sound);
   }
 
   exit(): void {

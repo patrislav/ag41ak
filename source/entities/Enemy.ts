@@ -40,7 +40,6 @@ class Enemy extends Entity {
     this.shootCooldown -= deltaTime;
     if (this.shootCooldown < 0) {
       let bullet = this.state.recycleEnemyBullet();
-      console.log(bullet);
       if (bullet) {
         bullet.reset();
         bullet.setShooter(this);
@@ -50,12 +49,22 @@ class Enemy extends Entity {
         this.state.addBullet(bullet);
       }
 
+      createjs.Sound.play("zap-2", { volume: 1 });
       this.shootCooldown = Util.randomFloat(3, 12);
     }
 
+  }
 
+  hit(damage: number): boolean {
+    createjs.Sound.play("hurt-1", { volume: 1 });
 
+    return super.hit(damage);
+  }
 
+  kill() {
+    super.kill();
+
+    createjs.Sound.play("boom-1", { volume: 1 });
   }
 
   getDisplayObject(): createjs.DisplayObject {

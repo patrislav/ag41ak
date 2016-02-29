@@ -18,6 +18,8 @@ class PlayState extends State {
 
   bullets: Bullet[] = [];
 
+  themeMusic: createjs.AbstractSoundInstance;
+
   constructor() {
     super();
   }
@@ -47,15 +49,26 @@ class PlayState extends State {
       let enemy = new Enemy(this, position.x, position.y);
       this.addEnemy(enemy);
     }
+
+    this.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
   }
 
   exit(): void {
+    Game.stage.removeAllChildren();
 
+    this.player = undefined;
+    this.enemies = [];
+    this.bullets = [];
+    this.themeMusic = undefined;
   }
 
   update(event: createjs.Event): void {
     $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
     $('.lives-number').text(this.player.health);
+
+    if(this.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
+      this.themeMusic.play({ volume: 0.35, loop: -1 });
+    }
 
     let deltaTime = event.delta / 1000; // event.delta is in ms
 
@@ -65,8 +78,6 @@ class PlayState extends State {
 
       if (this.collides(this.player, enemy) && this.player.hit(1)) {
         enemy.kill();
-        this.enemies = this.enemies.filter((x)=> x === enemy);
-        Game.removeChild(enemy);
 
         if (!this.player.alive) {
           Game.removeChild(this.player);
@@ -114,10 +125,7 @@ class PlayState extends State {
   }
 
   recycleEnemyBullet(): EnemyBullet {
-    return <EnemyBullet> _.find(this.bullets, (b: EnemyBullet)=>{
-      console.log(b instanceof EnemyBullet && !b.alive);
-      return b instanceof EnemyBullet && !b.alive;
-    });
+    return <EnemyBullet> _.find(this.bullets, (b: EnemyBullet)=> b instanceof EnemyBullet && !b.alive );
   }
 
   collides(objA: Entity, objB: Entity): boolean {
