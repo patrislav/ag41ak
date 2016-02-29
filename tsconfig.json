@@ -19,6 +19,7 @@
     "source/Boot.ts",
     "source/entities/Bullet.ts",
     "source/entities/Enemy.ts",
+    "source/entities/EnemyBullet.ts",
     "source/entities/Player.ts",
     "source/entities/PlayerBullet.ts",
     "source/Entity.ts",

@@ -6,13 +6,15 @@ import PlayerBullet = require('./PlayerBullet');
 import PlayState = require('../states/PlayState');
 
 class Player extends Entity {
-  static SPEED = 175; // px/second
-  static SHOOT_COOLDOWN = 0.4; // seconds
+  static SPEED = 250; // px/second
+  static SHOOT_COOLDOWN = 0.3; // seconds
+  static INVULN_TIME = 4; // seconds
 
   bitmap: createjs.Bitmap;
   state: PlayState;
 
   shootCooldown = 0;
+  invulnCooldown = 0;
 
   constructor(state: PlayState) {
     super(state);
@@ -26,23 +28,15 @@ class Player extends Entity {
     this.acceleration.x = 0;
     this.acceleration.y = 0;
 
-    this.updateHandler = (event: createjs.TickerEvent)=> ( this.update(event) );
+    this.health = 3;
 
-    this.addEventListener("added", ()=>( this.added() ));
-    this.addEventListener("removed", ()=>( this.removed() ));
-  }
+    this.localCollider = new createjs.Rectangle(23, 41, 48, 44);
 
-  added() {
-    createjs.Ticker.addEventListener("tick", this.updateHandler);
-  }
-
-  removed() {
-    createjs.Ticker.removeEventListener("tick", this.updateHandler);
+    this.enableUpdate();
   }
 
   update(event: createjs.TickerEvent) {
-    console.log(event);
-
+    super.update(event);
     let deltaTime = event.delta / 1000; // convert to seconds
 
     this.shootCooldown -= deltaTime;
@@ -51,6 +45,14 @@ class Player extends Entity {
 
     this.handleInput();
     this.updateMotion(deltaTime);
+
+    if (this.invulnerable) {
+      this.invulnCooldown -= deltaTime;
+      if (this.invulnCooldown <= 0) {
+        this.invulnerable = false;
+        this.invulnCooldown = 0;
+      }
+    }
   }
 
   handleInput() {
@@ -72,12 +74,47 @@ class Player extends Entity {
 
     if (Game.anyPressed([32])) { // 32 - space
       if (this.shootCooldown <= 0) {
-        let bullet = new PlayerBullet(this.state, this);
-        this.parent.addChild(bullet);
-        this.state.bullets.push(bullet);
+        let bullet = this.state.recyclePlayerBullet();
+        if (bullet) {
+          bullet.reset();
+          bullet.setShooter(this);
+        }
+        else {
+          bullet = new PlayerBullet(this.state, this);
+          this.state.addBullet(bullet);
+        }
 
         this.shootCooldown = Player.SHOOT_COOLDOWN;
       }
+    }
+  }
+
+  hit(damage: number): boolean {
+    let res = super.hit(damage);
+    if (res && this.alive) {
+      this.invulnerable = true;
+      this.invulnCooldown = Player.INVULN_TIME;
+      this.invulnerabilityEffect();
+    }
+    return res;
+  }
+
+  invulnerabilityEffect() {
+    if (!this.invulnerable) {
+      this.alpha = 1;
+      return;
+    }
+
+    if (this.alpha > 0.5) {
+      createjs.Tween.get(this)
+        .to({ alpha: 0.25 }, 400)
+        .call( ()=> this.invulnerabilityEffect() );
+    }
+    else {
+      createjs.Tween.get(this)
+        .to({ alpha: 0.90 }, 400)
+        .wait(200)
+        .call( ()=> this.invulnerabilityEffect() );
     }
   }
 

@@ -7,6 +7,8 @@ import Entity = require('../Entity');
 import Player = require('../entities/Player');
 import Enemy = require('../entities/Enemy');
 import Bullet = require('../entities/Bullet');
+import PlayerBullet = require('../entities/PlayerBullet');
+import EnemyBullet = require('../entities/EnemyBullet');
 
 class PlayState extends State {
   name: string = "PlayState";
@@ -33,11 +35,18 @@ class PlayState extends State {
     this.player.y = height-100;
     Game.addChild(this.player);
 
-    let enemy = new Enemy(this);
-    enemy.x = width/2;
-    enemy.y = 100;
-    Game.addChild(enemy);
-    this.enemies.push(enemy);
+    let enemyPositions = [
+      { x: width/2 - 300, y: 100 },
+      { x: width/2 - 150, y: 100 },
+      { x: width/2      , y: 100 },
+      { x: width/2 + 150, y: 100 },
+      { x: width/2 + 300, y: 100 }
+    ];
+
+    for (let position of enemyPositions) {
+      let enemy = new Enemy(this, position.x, position.y);
+      this.addEnemy(enemy);
+    }
   }
 
   exit(): void {
@@ -45,41 +54,76 @@ class PlayState extends State {
   }
 
   update(event: createjs.Event): void {
-    $('.thing').text("FPS: " + Math.round(createjs.Ticker.getMeasuredFPS()));
+    // $('.thing').text("FPS: " + Math.round(createjs.Ticker.getMeasuredFPS()));
+    $('.thing').text("Bullets: " + this.bullets.length);
 
     let deltaTime = event.delta / 1000; // event.delta is in ms
 
     // Check if player hits an enemy
     for(let enemy of this.enemies) {
-      if (this.collides(this.player, enemy)) {
+      if (!enemy.alive) continue;
+
+      if (this.collides(this.player, enemy) && this.player.hit(1)) {
+        enemy.kill();
         this.enemies = this.enemies.filter((x)=> x === enemy);
         Game.removeChild(enemy);
 
-        Game.removeChild(this.player);
+        if (!this.player.alive) {
+          Game.removeChild(this.player);
+        }
       }
     }
 
-    // Check if we shot down an enemy
+    // Check all the bullets
     for (let bullet of this.bullets) {
-      for (let enemy of this.enemies) {
-        if (this.collides(enemy, bullet)) {
-          this.enemies = this.enemies.filter((x)=> x === enemy);
-          Game.removeChild(enemy);
+      // Check if the Player shot down an Enemy
+      if (bullet.shooter instanceof Player) {
+        for (let enemy of this.enemies) {
+          if (!enemy.alive) continue;
 
-          this.bullets = this.bullets.filter((x)=> x === bullet);
-          Game.removeChild(bullet);
+          if (this.collides(enemy, bullet)) {
+            if (enemy.hit(bullet.damage)) {
+              bullet.kill();
+            }
+          }
+        }
+      }
+      // Check if an Enemy shot down the Player
+      else if (bullet.shooter instanceof Enemy) {
+        if (this.collides(this.player, bullet)) {
+          if (this.player.hit(bullet.damage)) {
+            bullet.kill();
+          }
         }
       }
     }
   }
 
-  collides(objA: Entity, objB: Entity): boolean {
-    let point1 = objA.localToGlobal(objA.getDisplayObject().x, objA.getDisplayObject().y);
-    let rect1 = new createjs.Rectangle(point1.x, point1.y, objA.getBounds().width, objA.getBounds().height);
-    let point2 = objB.localToGlobal(objB.getDisplayObject().x, objB.getDisplayObject().y);
-    let rect2 = new createjs.Rectangle(point2.x, point2.y, objB.getBounds().width, objB.getBounds().height);
+  addEnemy(enemy: Enemy) {
+    this.enemies.push(enemy);
+    Game.addChild(enemy);
+  }
 
-		if (rect1.intersects(rect2)) {
+  addBullet(bullet: Bullet) {
+    this.bullets.push(bullet);
+    Game.addChild(bullet);
+  }
+
+  recyclePlayerBullet(): PlayerBullet {
+    return <PlayerBullet> _.find(this.bullets, (b: Bullet)=> b instanceof PlayerBullet && !b.alive );
+  }
+
+  recycleEnemyBullet(): EnemyBullet {
+    return <EnemyBullet> _.find(this.bullets, (b: EnemyBullet)=>{
+      console.log(b instanceof EnemyBullet && !b.alive);
+      return b instanceof EnemyBullet && !b.alive;
+    });
+  }
+
+  collides(objA: Entity, objB: Entity): boolean {
+    if (!objA.alive || !objB.alive) return false;
+
+    if (objA.getCollider().intersects(objB.getCollider())) {
       return true;
     }
 

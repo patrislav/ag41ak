@@ -7,9 +7,18 @@ class PlayerBullet extends Bullet {
 
   constructor(state: PlayState, player: Player) {
     super(state);
+    this.setShooter(player);
+  }
 
-    this.shooter = player;
+  reset() {
+    super.reset();
+
+    this.damage = 1;
     this.velocity.set(0, -PlayerBullet.SPEED);
+  }
+
+  setShooter(player: Player) {
+    super.setShooter(player);
 
     this.x = player.x;
     this.y = player.y - 50;

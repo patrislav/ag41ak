@@ -1,6 +1,7 @@
 
 // The AMD dependencies will be available to all files importing this module
 /// <amd-dependency path="easel"/>
+/// <amd-dependency path="tween"/>
 /// <amd-dependency path="sound"/>
 /// <amd-dependency path="preload"/>
 
