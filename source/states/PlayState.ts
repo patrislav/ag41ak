@@ -39,9 +39,10 @@ class PlayState extends State {
 
     let enemyPositions = [
       { x: width/2 - 300, y: 100 },
-      { x: width/2 - 150, y: 100 },
-      { x: width/2      , y: 100 },
-      { x: width/2 + 150, y: 100 },
+      { x: width/2 - 180, y: 100 },
+      { x: width/2 -  60, y: 100 },
+      { x: width/2 +  60, y: 100 },
+      { x: width/2 + 180, y: 100 },
       { x: width/2 + 300, y: 100 }
     ];
 
