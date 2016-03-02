@@ -19,11 +19,24 @@ class PlayState extends State {
 
   bullets: Bullet[] = [];
 
+  paused: boolean;
+  score: number;
+
+  $ui: JQuery;
+  $waveMsg: JQuery;
+  $lives: JQuery;
+  $score: JQuery;
+
   constructor() {
     super();
   }
 
   enter(): void {
+    super.enter();
+
+    this.paused = true;
+    this.score = 0;
+
     let width = Game.stage.canvas['width'];
     let height = Game.stage.canvas['height'];
 
@@ -53,6 +66,17 @@ class PlayState extends State {
     if (!Shared.themeMusic) {
       Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
     }
+
+    createjs.Sound.play("start-1");
+    this.$ui.show();
+    this.$waveMsg.find('h1').text("Wave 1");
+    this.$waveMsg.find('h2').text("Are you ready?");
+    this.$waveMsg.fadeIn();
+
+    setTimeout(()=>{
+      this.$waveMsg.fadeOut();
+      this.paused = false;
+    }, 2000);
   }
 
   exit(): void {
@@ -61,17 +85,27 @@ class PlayState extends State {
     this.player = undefined;
     this.enemies = [];
     this.bullets = [];
+
+    this.$ui.hide();
   }
 
   update(event: createjs.Event): void {
-    $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
-    $('.lives-number').text(this.player.health);
+    // $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
+    // $('.lives-number').text(this.player.health);
+
+    this.$lives.find('span').text(this.player.health);
 
     if(Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
       Shared.themeMusic.play({ volume: 0.35, loop: -1 });
     }
 
     let deltaTime = event.delta / 1000; // event.delta is in ms
+
+    // Handle input
+    // TODO: It should pause the game and show in-game menu, though
+    if (Game.anyPressed([8, 27])) { // 8 - backspace, 27 - escape
+      Game.previousState();
+    }
 
     // Check if player hits an enemy
     for(let enemy of this.enemies) {
@@ -109,6 +143,20 @@ class PlayState extends State {
         }
       }
     }
+  }
+
+  initUI(): void {
+    this.$ui = $("<div/>").appendTo(Game.$ui);
+    this.$ui.addClass('game-ui-state-play');
+
+    this.$lives = $("<div/>").appendTo(this.$ui);
+    this.$lives.html("Lives: <span></span>");
+    this.$lives.addClass('game-play-lives');
+
+    this.$waveMsg = $("<div/>").appendTo(this.$ui);
+    this.$waveMsg.addClass('game-play-wavemsg');
+    $("<h1/>").appendTo(this.$waveMsg);
+    $("<h2/>").appendTo(this.$waveMsg);
   }
 
   addEnemy(enemy: Enemy) {

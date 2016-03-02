@@ -37,20 +37,22 @@ class Enemy extends Entity {
     super.update(event);
     let deltaTime = event.delta / 1000; // convert to seconds
 
-    this.shootCooldown -= deltaTime;
-    if (this.shootCooldown < 0) {
-      let bullet = this.state.recycleEnemyBullet();
-      if (bullet) {
-        bullet.reset();
-        bullet.setShooter(this);
-      }
-      else {
-        bullet = new EnemyBullet(this.state, this);
-        this.state.addBullet(bullet);
-      }
+    if (!this.state.paused) {
+      this.shootCooldown -= deltaTime;
+      if (this.shootCooldown < 0) {
+        let bullet = this.state.recycleEnemyBullet();
+        if (bullet) {
+          bullet.reset();
+          bullet.setShooter(this);
+        }
+        else {
+          bullet = new EnemyBullet(this.state, this);
+          this.state.addBullet(bullet);
+        }
 
-      createjs.Sound.play("zap-2", { volume: 1 });
-      this.shootCooldown = Util.randomFloat(3, 12);
+        createjs.Sound.play("zap-2", { volume: 1 });
+        this.shootCooldown = Util.randomFloat(3, 12);
+      }
     }
 
   }

@@ -19,16 +19,14 @@ class MenuState extends State {
   }
 
   enter(): void {
+    super.enter();
+
     let width = Game.stage.canvas['width'];
     let height = Game.stage.canvas['height'];
 
     let background = new createjs.Shape();
     background.graphics.beginFill("#DB7937").drawRect(0, 0, width, height);
     Game.stage.addChild(background);
-
-    if (!this.inited) {
-      this.initUI();
-    }
 
     this.flashingEffect(this.$subtitle);
 
@@ -60,7 +58,6 @@ class MenuState extends State {
   initUI(): void {
     this.$ui = $("<div/>").appendTo(Game.$ui);
     this.$ui.addClass('game-ui-state-menu');
-    this.$ui.css('position', 'absolute');
 
     this.$title = $("<h1/>").appendTo(this.$ui);
     this.$title.text("AG41AK");
@@ -68,10 +65,12 @@ class MenuState extends State {
     this.$subtitle = $("<h2/>").appendTo(this.$ui);
     this.$subtitle.html("Press <kbd>ENTER</kbd> or <kbd>SPACE</kbd> to <em>ENTER SPACE</em>.");
 
-    this.inited = true;
+    super.initUI();
   }
 
   flashingEffect($el: JQuery): void {
+    if (Game.currentState != this) return;
+
     if (parseFloat($el.css('opacity')) > 0.5) {
       $el.delay(700).animate({
           opacity: 0.30

@@ -46,7 +46,8 @@ class Bullet extends Entity {
     super.update(event);
     let deltaTime = event.delta / 1000; // convert to seconds
 
-    this.updateMotion(deltaTime);
+    if (!this.state.paused)
+      this.updateMotion(deltaTime);
 
     this.lifetime -= deltaTime;
     if (this.lifetime <= 0) {

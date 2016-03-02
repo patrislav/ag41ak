@@ -6,7 +6,8 @@ import PlayerBullet = require('./PlayerBullet');
 import PlayState = require('../states/PlayState');
 
 class Player extends Entity {
-  static SPEED = 250; // px/second
+  static SPEEDX = 300; // px/second
+  static SPEEDY = 200; // px/second
   static SHOOT_COOLDOWN = 0.3; // seconds
   static INVULN_TIME = 4; // seconds
 
@@ -23,8 +24,8 @@ class Player extends Entity {
     this.regY = this.bitmap.image.height/2;
     this.addChild(this.bitmap);
 
-    this.drag.set(Player.SPEED * 8, Player.SPEED * 8);
-    this.maxVelocity.set(Player.SPEED, Player.SPEED);
+    this.drag.set(Player.SPEEDX * 6, Player.SPEEDY * 6);
+    this.maxVelocity.set(Player.SPEEDX, Player.SPEEDY);
     this.acceleration.x = 0;
     this.acceleration.y = 0;
 
@@ -39,18 +40,20 @@ class Player extends Entity {
     super.update(event);
     let deltaTime = event.delta / 1000; // convert to seconds
 
-    this.shootCooldown -= deltaTime;
-    if (this.shootCooldown < 0)
-      this.shootCooldown = 0;
+    if (!this.state.paused) {
+      this.shootCooldown -= deltaTime;
+      if (this.shootCooldown < 0)
+        this.shootCooldown = 0;
 
-    this.handleInput();
-    this.updateMotion(deltaTime);
+      this.handleInput();
+      this.updateMotion(deltaTime);
 
-    if (this.invulnerable) {
-      this.invulnCooldown -= deltaTime;
-      if (this.invulnCooldown <= 0) {
-        this.invulnerable = false;
-        this.invulnCooldown = 0;
+      if (this.invulnerable) {
+        this.invulnCooldown -= deltaTime;
+        if (this.invulnCooldown <= 0) {
+          this.invulnerable = false;
+          this.invulnCooldown = 0;
+        }
       }
     }
   }
