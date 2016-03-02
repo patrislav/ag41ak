@@ -9,11 +9,15 @@ import _ = require('underscore');
 import $ = require("jquery");
 import State = require("./State");
 import Entity = require("./Entity");
+import EnemyRow = require("./entities/EnemyRow");
 
 // Public properties
 export let canvas: HTMLElement;
 export let stage: createjs.Stage;
 export let $ui: JQuery;
+
+export let width: number;
+export let height: number;
 
 export let states: State[];
 export let currentState: State;
@@ -31,6 +35,9 @@ export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
   }
 
   canvas = _canvas;
+  width = canvas['width'];
+  height = canvas['height'];
+
   stage = new createjs.Stage(canvas);
   $ui = $("<div/>").insertBefore( $(canvas) );
   $ui.addClass('game-ui');
@@ -109,11 +116,11 @@ export function previousState() {
   }
 }
 
-export function addChild(entity: Entity) {
+export function addChild(entity: Entity|EnemyRow) {
   stage.addChild(entity);
 }
 
-export function removeChild(entity: Entity) {
+export function removeChild(entity: Entity|EnemyRow) {
   stage.removeChild(entity);
 }
 

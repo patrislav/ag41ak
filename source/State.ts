@@ -5,6 +5,7 @@ class State {
   name: string;
 
   uiInited: boolean = false;
+  paused: boolean = false;
 
   enter(): void {
     if (!this.uiInited) {

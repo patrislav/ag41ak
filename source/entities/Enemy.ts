@@ -4,13 +4,16 @@ import Game = require('../Game');
 import Util = require('../Util');
 import PlayState = require('../states/PlayState');
 import EnemyBullet = require('./EnemyBullet');
+import EnemyRow = require('./EnemyRow');
 
 class Enemy extends Entity {
 
   static SIZE = 50;
 
   state: PlayState;
-  shape: createjs.Shape;
+  bitmap: createjs.Bitmap;
+  row: EnemyRow;
+  shootEnabled: boolean;
 
   shootCooldown: number = Util.randomFloat(1, 5);
 
@@ -20,15 +23,13 @@ class Enemy extends Entity {
     if (x) this.x = x;
     if (y) this.y = y;
 
-    this.shape = new createjs.Shape();
-    this.shape.graphics.beginFill('#000000').drawRect(0, 0, Enemy.SIZE, Enemy.SIZE);
-    this.shape.setBounds(0, 0, Enemy.SIZE, Enemy.SIZE);
-    this.addChild(this.shape);
-
-    this.regX = Enemy.SIZE/2;
-    this.regY = Enemy.SIZE/2;
+    this.bitmap = new createjs.Bitmap(Game.assets['alien1-1']);
+    this.regX = this.bitmap.image.width/2;
+    this.regY = this.bitmap.image.height/2;
+    this.addChild(this.bitmap);
 
     this.health = 2;
+    this.shootEnabled = false;
 
     this.enableUpdate();
   }
@@ -37,7 +38,7 @@ class Enemy extends Entity {
     super.update(event);
     let deltaTime = event.delta / 1000; // convert to seconds
 
-    if (!this.state.paused) {
+    if (!this.state.paused && this.alive && this.shootEnabled) {
       this.shootCooldown -= deltaTime;
       if (this.shootCooldown < 0) {
         let bullet = this.state.recycleEnemyBullet();
@@ -50,7 +51,6 @@ class Enemy extends Entity {
           this.state.addBullet(bullet);
         }
 
-        createjs.Sound.play("zap-2", { volume: 1 });
         this.shootCooldown = Util.randomFloat(3, 12);
       }
     }
@@ -65,12 +65,13 @@ class Enemy extends Entity {
 
   kill() {
     super.kill();
+    this.state.enemyShootCheck();
 
     createjs.Sound.play("boom-1", { volume: 1 });
   }
 
   getDisplayObject(): createjs.DisplayObject {
-    return this.shape;
+    return this.bitmap;
   }
 
 }

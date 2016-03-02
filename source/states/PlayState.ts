@@ -7,6 +7,7 @@ import Shared = require('../Shared');
 import Entity = require('../Entity');
 import Player = require('../entities/Player');
 import Enemy = require('../entities/Enemy');
+import EnemyRow = require('../entities/EnemyRow');
 import Bullet = require('../entities/Bullet');
 import PlayerBullet = require('../entities/PlayerBullet');
 import EnemyBullet = require('../entities/EnemyBullet');
@@ -14,12 +15,17 @@ import EnemyBullet = require('../entities/EnemyBullet');
 class PlayState extends State {
   name: string = "PlayState";
 
+  // Number of pixels between playable area and canvas border
+  borderSize: number = 50;
+
   player: Player;
   enemies: Enemy[] = [];
+  enemyRows: EnemyRow[] = [];
+
+  enemyColumns: number = 8;
 
   bullets: Bullet[] = [];
 
-  paused: boolean;
   score: number;
 
   $ui: JQuery;
@@ -37,31 +43,40 @@ class PlayState extends State {
     this.paused = true;
     this.score = 0;
 
-    let width = Game.stage.canvas['width'];
-    let height = Game.stage.canvas['height'];
-
     let background = new createjs.Shape();
-    background.graphics.beginFill("#DB7937").drawRect(0, 0, width, height);
+    background.graphics.beginFill("#DB7937").drawRect(0, 0, Game.width, Game.height);
     Game.stage.addChild(background);
 
     this.player = new Player(this);
-    this.player.x = width/2;
-    this.player.y = height-100;
+    this.player.x = Game.width/2;
+    this.player.y = Game.height-100;
     Game.addChild(this.player);
 
-    let enemyPositions = [
-      { x: width/2 - 300, y: 100 },
-      { x: width/2 - 180, y: 100 },
-      { x: width/2 -  60, y: 100 },
-      { x: width/2 +  60, y: 100 },
-      { x: width/2 + 180, y: 100 },
-      { x: width/2 + 300, y: 100 }
-    ];
-
-    for (let position of enemyPositions) {
-      let enemy = new Enemy(this, position.x, position.y);
-      this.addEnemy(enemy);
+    for (let i = 0; i < 4; i++) {
+      let enemyRow = new EnemyRow(this, 8);
+      enemyRow.x = Game.width/2;
+      enemyRow.y = 50 + 50*i;
+      this.enemyRows.push(enemyRow);
+      Game.addChild(enemyRow);
     }
+
+    this.enemyShootCheck();
+
+    // let enemyPositions = [
+    //   { x: width/2 - 300, y: 100 },
+    //   { x: width/2 - 230, y: 100 },
+    //   { x: width/2 - 160, y: 100 },
+    //   { x: width/2 - 90, y: 100 },
+    //   { x: width/2 - 20, y: 100 },
+    //   { x: width/2 + 50, y: 100 },
+    //   { x: width/2 + 120, y: 100 },
+    //   { x: width/2 + 190, y: 100 }
+    // ];
+    //
+    // for (let position of enemyPositions) {
+    //   let enemy = new Enemy(this, position.x, position.y);
+    //   this.addEnemy(enemy);
+    // }
 
     if (!Shared.themeMusic) {
       Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
@@ -85,6 +100,7 @@ class PlayState extends State {
     this.player = undefined;
     this.enemies = [];
     this.bullets = [];
+    this.enemyRows = [];
 
     this.$ui.hide();
   }
@@ -177,14 +193,20 @@ class PlayState extends State {
     return <EnemyBullet> _.find(this.bullets, (b: EnemyBullet)=> b instanceof EnemyBullet && !b.alive );
   }
 
-  collides(objA: Entity, objB: Entity): boolean {
-    if (!objA.alive || !objB.alive) return false;
-
-    if (objA.getCollider().intersects(objB.getCollider())) {
-      return true;
+  enemyShootCheck() {
+    for (let c = 0; c < this.enemyColumns; c++) {
+      for (let i = this.enemyRows.length-1; i >= 0; i--) {
+        let enemy = <Enemy> this.enemyRows[i].getChildAt(c);
+        if (enemy.alive) {
+          enemy.shootEnabled = true;
+          break;
+        }
+      }
     }
+  }
 
-    return false;
+  collides(objA: Entity, objB: Entity): boolean {
+    return objA.collides(objB);
   }
 }
 

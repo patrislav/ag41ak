@@ -27,6 +27,12 @@ class Bullet extends Entity {
 
     this.lifetime = 10;
 
+    this.render();
+
+    this.damage = 0;
+  }
+
+  render() {
     this.shape = new createjs.Shape();
     this.shape.graphics.beginFill('#ffffff').drawRect(0, 0, Bullet.WIDTH, Bullet.HEIGHT);
     this.shape.setBounds(0, 0, Bullet.WIDTH, Bullet.HEIGHT);
@@ -34,8 +40,6 @@ class Bullet extends Entity {
 
     this.regX = Bullet.WIDTH/2;
     this.regY = Bullet.HEIGHT/2;
-
-    this.damage = 0;
   }
 
   setShooter(shooter: Entity) {

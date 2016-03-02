@@ -47,6 +47,8 @@ class Entity extends createjs.Container {
   }
 
   updateMotion(deltaTime: number) {
+    if (this.state.paused) return;
+
     let velocityDelta = 0.5 * (Util.computeVelocity(this.velocity.x, this.acceleration.x, this.drag.x, this.maxVelocity.x, deltaTime) - this.velocity.x);
 		this.velocity.x += velocityDelta;
 		let delta = this.velocity.x * deltaTime;
@@ -111,6 +113,16 @@ class Entity extends createjs.Container {
   }
 
   update(event: createjs.TickerEvent) {
+  }
+
+  collides(obj: Entity): boolean {
+    if (!this.alive || !obj.alive) return false;
+
+    if (this.getCollider().intersects(obj.getCollider())) {
+      return true;
+    }
+
+    return false;
   }
 
 }
