@@ -13,6 +13,7 @@ import Entity = require("./Entity");
 // Public properties
 export let canvas: HTMLElement;
 export let stage: createjs.Stage;
+export let $ui: JQuery;
 
 export let states: State[];
 export let currentState: State;
@@ -29,6 +30,8 @@ export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
 
   canvas = _canvas;
   stage = new createjs.Stage(canvas);
+  $ui = $("<div/>").insertBefore( $(canvas) );
+  $ui.addClass('game-ui');
 
   if (_firstStateName) {
     currentState = findState(_firstStateName);

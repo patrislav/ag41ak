@@ -26,6 +26,7 @@
     "source/Game.ts",
     "source/Main.ts",
     "source/State.ts",
+    "source/states/MenuState.ts",
     "source/states/PlayState.ts",
     "source/states/PreloadState.ts",
     "source/Util.ts",

@@ -55,7 +55,7 @@ class PlayState extends State {
   }
 
   exit(): void {
-    Game.stage.removeAllChildren();
+    super.exit();
 
     this.player = undefined;
     this.enemies = [];
