@@ -25,6 +25,7 @@
     "source/Entity.ts",
     "source/Game.ts",
     "source/Main.ts",
+    "source/Shared.ts",
     "source/State.ts",
     "source/states/MenuState.ts",
     "source/states/PlayState.ts",

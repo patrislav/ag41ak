@@ -3,6 +3,7 @@ import $ = require('jquery');
 import _ = require('underscore');
 import State = require('../State');
 import Game = require('../Game');
+import Shared = require('../Shared');
 
 class MenuState extends State {
   name: string = "MenuState";
@@ -32,6 +33,10 @@ class MenuState extends State {
     this.flashingEffect(this.$subtitle);
 
     this.$ui.show();
+
+    if (!Shared.themeMusic) {
+      Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
+    }
   }
 
   exit(): void {
@@ -42,6 +47,10 @@ class MenuState extends State {
 
   update(event: createjs.TickerEvent): void {
     let deltaTime = event.delta / 1000;
+
+    if(Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
+      Shared.themeMusic.play({ volume: 0.35, loop: -1 });
+    }
 
     if (Game.anyPressed([13, 32])) { // 13 - enter, 32 - space
       Game.nextState();

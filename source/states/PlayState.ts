@@ -3,6 +3,7 @@ import $ = require('jquery');
 import _ = require('underscore');
 import State = require('../State');
 import Game = require('../Game');
+import Shared = require('../Shared');
 import Entity = require('../Entity');
 import Player = require('../entities/Player');
 import Enemy = require('../entities/Enemy');
@@ -17,8 +18,6 @@ class PlayState extends State {
   enemies: Enemy[] = [];
 
   bullets: Bullet[] = [];
-
-  themeMusic: createjs.AbstractSoundInstance;
 
   constructor() {
     super();
@@ -51,7 +50,9 @@ class PlayState extends State {
       this.addEnemy(enemy);
     }
 
-    this.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
+    if (!Shared.themeMusic) {
+      Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
+    }
   }
 
   exit(): void {
@@ -60,15 +61,14 @@ class PlayState extends State {
     this.player = undefined;
     this.enemies = [];
     this.bullets = [];
-    this.themeMusic = undefined;
   }
 
   update(event: createjs.Event): void {
     $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
     $('.lives-number').text(this.player.health);
 
-    if(this.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
-      this.themeMusic.play({ volume: 0.35, loop: -1 });
+    if(Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
+      Shared.themeMusic.play({ volume: 0.35, loop: -1 });
     }
 
     let deltaTime = event.delta / 1000; // event.delta is in ms
