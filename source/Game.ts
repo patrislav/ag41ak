@@ -22,6 +22,8 @@ export let assets: Object = {};
 
 export let keys: Object = {};
 
+let $soundButton: JQuery;
+
 // Public functions
 export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
   if (!states || states.length == 0) {
@@ -32,6 +34,18 @@ export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
   stage = new createjs.Stage(canvas);
   $ui = $("<div/>").insertBefore( $(canvas) );
   $ui.addClass('game-ui');
+
+  $soundButton = $("<div/>").appendTo($ui);
+  $soundButton.addClass('game-sound-button');
+
+  let $btn = $('<a href="#"/>').appendTo($soundButton);
+  $btn.addClass('game-sound-button-on');
+  $btn.click(soundButtonClick);
+
+  $btn = $('<a href="#"/>').appendTo($soundButton);
+  $btn.addClass('game-sound-button-off');
+  $btn.click(soundButtonClick);
+  $btn.hide();
 
   if (_firstStateName) {
     currentState = findState(_firstStateName);
@@ -46,6 +60,12 @@ export function setup(_canvas: HTMLElement, _firstStateName?: string): boolean {
   createjs.Ticker.addEventListener("tick", tick);
 
   return true;
+}
+
+function soundButtonClick(event) {
+  $(this).parent().find('a').toggle();
+  createjs.Sound.muted = !createjs.Sound.muted;
+  event.preventDefault();
 }
 
 export function registerStates(_states: State[]) {
