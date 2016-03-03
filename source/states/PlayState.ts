@@ -26,6 +26,8 @@ class PlayState extends State {
 
   bullets: Bullet[] = [];
 
+  currentWave: number;
+  wonWave: boolean;
   score: number;
 
   $ui: JQuery;
@@ -52,46 +54,16 @@ class PlayState extends State {
     this.player.y = Game.height-100;
     Game.addChild(this.player);
 
-    for (let i = 0; i < 4; i++) {
-      let enemyRow = new EnemyRow(this, 8);
-      enemyRow.x = Game.width/2;
-      enemyRow.y = 50 + 50*i;
-      this.enemyRows.push(enemyRow);
-      Game.addChild(enemyRow);
-    }
-
-    this.enemyShootCheck();
-
-    // let enemyPositions = [
-    //   { x: width/2 - 300, y: 100 },
-    //   { x: width/2 - 230, y: 100 },
-    //   { x: width/2 - 160, y: 100 },
-    //   { x: width/2 - 90, y: 100 },
-    //   { x: width/2 - 20, y: 100 },
-    //   { x: width/2 + 50, y: 100 },
-    //   { x: width/2 + 120, y: 100 },
-    //   { x: width/2 + 190, y: 100 }
-    // ];
-    //
-    // for (let position of enemyPositions) {
-    //   let enemy = new Enemy(this, position.x, position.y);
-    //   this.addEnemy(enemy);
-    // }
-
     if (!Shared.themeMusic) {
       Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
     }
 
     createjs.Sound.play("start-1");
     this.$ui.show();
-    this.$waveMsg.find('h1').text("Wave 1");
-    this.$waveMsg.find('h2').text("Are you ready?");
-    this.$waveMsg.fadeIn();
 
-    setTimeout(()=>{
-      this.$waveMsg.fadeOut();
-      this.paused = false;
-    }, 2000);
+    this.currentWave = 1;
+    this.wonWave = false;
+    this.startWave(this.currentWave);
   }
 
   exit(): void {
@@ -101,6 +73,7 @@ class PlayState extends State {
     this.enemies = [];
     this.bullets = [];
     this.enemyRows = [];
+    this.wonWave = false;
 
     this.$ui.hide();
   }
@@ -129,6 +102,7 @@ class PlayState extends State {
 
       if (this.collides(this.player, enemy) && this.player.hit(1)) {
         enemy.kill();
+        this.removeEnemy(enemy);
 
         if (!this.player.alive) {
           Game.removeChild(this.player);
@@ -145,6 +119,8 @@ class PlayState extends State {
 
           if (this.collides(enemy, bullet)) {
             if (enemy.hit(bullet.damage)) {
+              if (!enemy.alive) this.removeEnemy(enemy);
+
               bullet.kill();
             }
           }
@@ -158,6 +134,12 @@ class PlayState extends State {
           }
         }
       }
+    }
+
+
+    // Check for wave win
+    if (this.enemies.length == 0 && !this.wonWave) {
+      this.winWave();
     }
   }
 
@@ -175,9 +157,62 @@ class PlayState extends State {
     $("<h2/>").appendTo(this.$waveMsg);
   }
 
+  startWave(wave: number) {
+    this.$waveMsg.find('h1').text("Wave " + wave);
+    this.$waveMsg.find('h2').text("Are you ready?");
+    this.$waveMsg.fadeIn();
+
+    for (let row of this.enemyRows) {
+      Game.removeChild(row);
+    }
+
+    this.enemies = [];
+    this.enemyRows = [];
+
+    for (let i = 0; i < 4; i++) {
+      let enemyRow = new EnemyRow(this, 8);
+      enemyRow.x = Game.width/2;
+      enemyRow.y = 50 + 50*i;
+      this.enemyRows.push(enemyRow);
+      Game.addChild(enemyRow);
+    }
+
+    this.enemyShootCheck();
+
+    this.player.x = Game.width/2;
+    this.player.y = Game.height-100;
+
+    setTimeout(()=>{
+      this.$waveMsg.fadeOut();
+      this.paused = false;
+      this.wonWave = false;
+    }, 2000);
+  }
+
+  winWave() {
+    this.wonWave = true;
+    this.currentWave += 1;
+
+    this.enemies = [];
+    this.enemyRows = [];
+
+    for (let bullet of this.bullets) {
+      bullet.kill();
+    }
+
+    setTimeout(()=>{
+      this.paused = true;
+      this.startWave(this.currentWave);
+    }, 1000);
+  }
+
   addEnemy(enemy: Enemy) {
     this.enemies.push(enemy);
     Game.addChild(enemy);
+  }
+
+  removeEnemy(enemy: Enemy) {
+    this.enemies = this.enemies.filter(e => e != enemy);
   }
 
   addBullet(bullet: Bullet) {
