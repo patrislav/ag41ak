@@ -4,5 +4,33 @@
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
-  "installed": {}
+  "installed": {
+    "createjs-lib/createjs-lib.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "createjs/createjs.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "soundjs/soundjs.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "preloadjs/preloadjs.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "easeljs/easeljs.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "tweenjs/tweenjs.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "jquery/jquery.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "requirejs/require.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "12f9b621f914fe2b9486a74e0f2e130621837bfc"
+    }
+  }
 }
