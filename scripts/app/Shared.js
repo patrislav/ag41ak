@@ -1,6 +1,3 @@
-/**
- * Small utility module for keeping all those shared inter-state objects.
- */
 define(["require", "exports"], function (require, exports) {
+    "use strict";
 });
-//# sourceMappingURL=Shared.js.map

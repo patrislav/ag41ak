@@ -3,7 +3,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define(["require", "exports", '../State', '../Game'], function (require, exports, State, Game) {
+define(["require", "exports", '../State', '../Util', '../Game'], function (require, exports, State, Util, Game) {
+    "use strict";
     var PreloadState = (function (_super) {
         __extends(PreloadState, _super);
         function PreloadState() {
@@ -13,7 +14,8 @@ define(["require", "exports", '../State', '../Game'], function (require, exports
         }
         PreloadState.prototype.enter = function () {
             var that = this;
-            this.loadQueue.loadManifest("../../../assets/manifest.json");
+            console.log(Util.getUrl("assets/manifest.json"));
+            this.loadQueue.loadManifest(Util.getUrl("assets/manifest.json"));
             this.loadQueue.on("complete", function () { return (that.handleComplete()); });
             createjs.Sound.alternateExtensions = ["wav", "mp3"];
             this.loadQueue.installPlugin(createjs.Sound);
@@ -30,7 +32,6 @@ define(["require", "exports", '../State', '../Game'], function (require, exports
             Game.nextState();
         };
         return PreloadState;
-    })(State);
+    }(State));
     return PreloadState;
 });
-//# sourceMappingURL=PreloadState.js.map

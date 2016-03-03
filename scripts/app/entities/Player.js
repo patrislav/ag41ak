@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", '../Entity', '../Game', './PlayerBullet'], function (require, exports, Entity, Game, PlayerBullet) {
+    "use strict";
     var Player = (function (_super) {
         __extends(Player, _super);
         function Player(state) {
@@ -112,7 +113,6 @@ define(["require", "exports", '../Entity', '../Game', './PlayerBullet'], functio
         Player.SHOOT_COOLDOWN = 0.3;
         Player.INVULN_TIME = 4;
         return Player;
-    })(Entity);
+    }(Entity));
     return Player;
 });
-//# sourceMappingURL=Player.js.map

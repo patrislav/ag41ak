@@ -1,9 +1,5 @@
-// The AMD dependencies will be available to all files importing this module
-/// <amd-dependency path="easel"/>
-/// <amd-dependency path="tween"/>
-/// <amd-dependency path="sound"/>
-/// <amd-dependency path="preload"/>
 define(["require", "exports", 'underscore', "jquery", "easel", "tween", "sound", "preload"], function (require, exports, _, $) {
+    "use strict";
     exports.assets = {};
     exports.keys = {};
     var $soundButton;
@@ -90,8 +86,8 @@ define(["require", "exports", 'underscore', "jquery", "easel", "tween", "sound",
     }
     exports.removeChild = removeChild;
     function anyPressed(keycodes) {
-        for (var _i = 0; _i < keycodes.length; _i++) {
-            var keycode = keycodes[_i];
+        for (var _i = 0, keycodes_1 = keycodes; _i < keycodes_1.length; _i++) {
+            var keycode = keycodes_1[_i];
             if (exports.keys[keycode]) {
                 return true;
             }
@@ -120,4 +116,3 @@ define(["require", "exports", 'underscore', "jquery", "easel", "tween", "sound",
         return false;
     }
 });
-//# sourceMappingURL=Game.js.map

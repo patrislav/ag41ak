@@ -1,9 +1,5 @@
-/**
- * Util.ts
- *
- * Small utilities module.
- */
 define(["require", "exports"], function (require, exports) {
+    "use strict";
     var Vector2 = (function () {
         function Vector2(x, y) {
             if (x === void 0) { x = 0; }
@@ -16,8 +12,16 @@ define(["require", "exports"], function (require, exports) {
             this.y = _y;
         };
         return Vector2;
-    })();
+    }());
     exports.Vector2 = Vector2;
+    function getUrl(path) {
+        var url = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+        if (path) {
+            url += path;
+        }
+        return url;
+    }
+    exports.getUrl = getUrl;
     function randomFloat(min, max) {
         return Math.random() * (max - min + 1) + min;
     }
@@ -54,4 +58,3 @@ define(["require", "exports"], function (require, exports) {
     }
     exports.computeVelocity = computeVelocity;
 });
-//# sourceMappingURL=Util.js.map

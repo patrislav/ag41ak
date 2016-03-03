@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", 'jquery', '../State', '../Game', '../Shared'], function (require, exports, $, State, Game, Shared) {
+    "use strict";
     var MenuState = (function (_super) {
         __extends(MenuState, _super);
         function MenuState() {
@@ -62,7 +63,6 @@ define(["require", "exports", 'jquery', '../State', '../Game', '../Shared'], fun
             }
         };
         return MenuState;
-    })(State);
+    }(State));
     return MenuState;
 });
-//# sourceMappingURL=MenuState.js.map

@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", '../Entity'], function (require, exports, Entity) {
+    "use strict";
     var Bullet = (function (_super) {
         __extends(Bullet, _super);
         function Bullet(state) {
@@ -44,7 +45,6 @@ define(["require", "exports", '../Entity'], function (require, exports, Entity) 
         Bullet.WIDTH = 4;
         Bullet.HEIGHT = 12;
         return Bullet;
-    })(Entity);
+    }(Entity));
     return Bullet;
 });
-//# sourceMappingURL=Bullet.js.map

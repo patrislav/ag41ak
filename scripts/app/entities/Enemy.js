@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'], function (require, exports, Entity, Game, Util, EnemyBullet) {
+    "use strict";
     var Enemy = (function (_super) {
         __extends(Enemy, _super);
         function Enemy(state, x, y) {
@@ -54,7 +55,6 @@ define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'
         };
         Enemy.SIZE = 50;
         return Enemy;
-    })(Entity);
+    }(Entity));
     return Enemy;
 });
-//# sourceMappingURL=Enemy.js.map

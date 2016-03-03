@@ -1,4 +1,5 @@
 define(["require", "exports", "./Game"], function (require, exports, Game) {
+    "use strict";
     var State = (function () {
         function State() {
             this.uiInited = false;
@@ -17,7 +18,6 @@ define(["require", "exports", "./Game"], function (require, exports, Game) {
             this.uiInited = true;
         };
         return State;
-    })();
+    }());
     return State;
 });
-//# sourceMappingURL=State.js.map

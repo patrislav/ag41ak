@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '../Shared', '../entities/Player', '../entities/Enemy', '../entities/EnemyRow', '../entities/PlayerBullet', '../entities/EnemyBullet'], function (require, exports, $, _, State, Game, Shared, Player, Enemy, EnemyRow, PlayerBullet, EnemyBullet) {
+    "use strict";
     var PlayState = (function (_super) {
         __extends(PlayState, _super);
         function PlayState() {
@@ -45,8 +46,6 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             this.$ui.hide();
         };
         PlayState.prototype.update = function (event) {
-            // $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
-            // $('.lives-number').text(this.player.health);
             this.$lives.find('span').text(this.player.health);
             if (Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
                 Shared.themeMusic.play({ volume: 0.35, loop: -1 });
@@ -180,7 +179,6 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             return objA.collides(objB);
         };
         return PlayState;
-    })(State);
+    }(State));
     return PlayState;
 });
-//# sourceMappingURL=PlayState.js.map
