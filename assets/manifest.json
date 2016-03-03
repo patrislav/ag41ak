@@ -1,0 +1,12 @@
+{"manifest":[
+  { "id": "player", "src": "assets/images/Player.png" },
+  { "id": "alien1-1", "src": "assets/images/alien1-1.png" },
+  { "id": "zap-1", "src": "assets/sounds/zap-1.ogg" },
+  { "id": "zap-2", "src": "assets/sounds/zap-2.wav" },
+  { "id": "boom-1", "src": "assets/sounds/boom-1.wav" },
+  { "id": "boom-2", "src": "assets/sounds/boom-1.wav" },
+  { "id": "lose-1", "src": "assets/sounds/lose-1.wav" },
+  { "id": "hurt-1", "src": "assets/sounds/hurt-1.wav" },
+  { "id": "start-1", "src": "assets/sounds/start-1.wav" },
+  { "id": "theme-1", "src": "assets/music/TippinOfCows_Moosader.ogg" }
+]}
