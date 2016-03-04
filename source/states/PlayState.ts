@@ -135,7 +135,6 @@ class PlayState extends State {
   }
 
   startWave(wave: number) {
-    console.log("start wave " + wave);
     this.comboCounter = 0;
     this.comboCooldown = 0;
 
@@ -187,6 +186,17 @@ class PlayState extends State {
     let enemyRow = new EnemyRow(this, 8);
     enemyRow.x = Game.width/2;
     enemyRow.y = 100 + 40*rowNumber;
+
+    let max = 15 - this.currentWave/2;
+    if (max < 8) max = 8;
+    enemyRow.shootCooldownRange = new Util.Range(3, max);
+
+    let min = 70 + (this.currentWave-1)*10;
+    if (min > 200) min = 200;
+    max = 200 + (this.currentWave-1)*10;
+    if (max > 400) max = 400;
+    enemyRow.bulletSpeedRange = new Util.Range(min, max);
+
     enemyRow.alpha = 0;
     createjs.Tween.get(enemyRow)
       .to({ alpha: 1 }, 500);

@@ -12,6 +12,22 @@ export class Vector2 {
   }
 }
 
+export class Range {
+  constructor(public min: number = 0, public max: number = 0) { }
+
+  set(min: number, max: number) {
+    this.min = min; this.max = max;
+  }
+
+  randomFloat(): number {
+    return randomFloat(this.min, this.max);
+  }
+
+  randomInteger(): number {
+    return randomInteger(this.min, this.max);
+  }
+}
+
 export function getUrl(path?: string) {
   let url = window.location.href.substring(0, window.location.href.lastIndexOf("/")+1);
   if (path) {

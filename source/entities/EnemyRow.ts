@@ -1,16 +1,20 @@
 import Entity = require('../Entity');
 import Enemy = require('./Enemy');
 import Game = require('../Game');
+import Util = require('../Util');
 import PlayState = require('../states/PlayState');
 
 class EnemyRow extends Entity {
 
   state: PlayState;
 
-  static SPEED = 50;
+  static SPEED = 40;
 
   speed: number;
   initialCount: number;
+
+  shootCooldownRange = new Util.Range(3, 12);
+  bulletSpeedRange = new Util.Range(150, 250);
 
   constructor(state: PlayState, numberOfEnemies: number) {
     super(state);
@@ -29,6 +33,8 @@ class EnemyRow extends Entity {
       enemy.x = enemy.regX + i * (enemy.getBounds().width + 10);
       enemy.y = enemy.regY;
       enemy.row = this;
+      enemy.shootCooldownRange = this.shootCooldownRange;
+      enemy.bulletSpeedRange = this.bulletSpeedRange;
       this.addChild(enemy);
       this.state.enemies.push(enemy);
     }

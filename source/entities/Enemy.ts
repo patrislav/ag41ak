@@ -16,6 +16,8 @@ class Enemy extends Entity {
 
   shootEnabled: boolean;
   shootCooldown: number = Util.randomFloat(1, 5);
+  shootCooldownRange = new Util.Range(3, 12);
+  bulletSpeedRange = new Util.Range(150, 250);
 
   baseScore: number;
 
@@ -53,8 +55,9 @@ class Enemy extends Entity {
           bullet = new EnemyBullet(this.state, this);
           this.state.addBullet(bullet);
         }
+        bullet.setSpeed(this.bulletSpeedRange.randomInteger());
 
-        this.shootCooldown = Util.randomFloat(3, 12);
+        this.shootCooldown = this.shootCooldownRange.randomFloat();
       }
     }
 

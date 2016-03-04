@@ -5,7 +5,6 @@ import PlayState = require('../states/PlayState');
 
 class EnemyBullet extends Bullet {
 
-  static SPEED = 200;
   static RADIUS = 3;
 
   constructor(state: PlayState, enemy: Enemy) {
@@ -38,7 +37,9 @@ class EnemyBullet extends Bullet {
     this.y = position.y + 10;
   }
 
-
+  setSpeed(speed: number) {
+    this.velocity.y = speed;
+  }
 
 }
 

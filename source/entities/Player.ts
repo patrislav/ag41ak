@@ -18,7 +18,7 @@ class Player extends Entity {
   shootCooldown = 0;
   invulnCooldown = 0;
 
-  respawning = true;
+  respawning = false;
 
   constructor(state: PlayState) {
     super(state);
