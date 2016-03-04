@@ -3,6 +3,7 @@ import $ = require('jquery');
 import _ = require('underscore');
 import State = require('../State');
 import Game = require('../Game');
+import Util = require('../Util');
 import Shared = require('../Shared');
 import Entity = require('../Entity');
 import Player = require('../entities/Player');
@@ -32,6 +33,9 @@ class PlayState extends State {
   currentWave: number;
   wonWave: boolean;
   score: number;
+
+  comboCooldown: number;
+  comboCounter: number;
 
   $ui: JQuery;
   $waveMsg: JQuery;
@@ -65,7 +69,7 @@ class PlayState extends State {
     this.$ui.show();
 
     this.currentWave = 1;
-    this.wonWave = false;
+    this.wonWave = true;
     this.startWave(this.currentWave);
   }
 
@@ -86,17 +90,24 @@ class PlayState extends State {
 
     this.updateUI();
 
-    // Handle input
-    // TODO: It should pause the game and show in-game menu, though
-    if (Game.anyPressed([8, 27])) { // 8 - backspace, 27 - escape
-      Game.previousState();
-    }
-
     this.checkCollisions();
+
+    // Handle combo
+    this.comboCooldown -= deltaTime;
+    if (this.comboCooldown < 0) {
+      this.comboCooldown = 0;
+      this.comboCounter = 0;
+    }
 
     // Check for wave win
     if (this.enemies.length == 0 && !this.wonWave) {
       this.winWave();
+    }
+
+    // Handle input
+    // TODO: It should pause the game and show in-game menu, though
+    if (Game.anyPressed([8, 27])) { // 8 - backspace, 27 - escape
+      Game.previousState();
     }
   }
 
@@ -124,6 +135,10 @@ class PlayState extends State {
   }
 
   startWave(wave: number) {
+    console.log("start wave " + wave);
+    this.comboCounter = 0;
+    this.comboCooldown = 0;
+
     this.$waveMsg.find('h1').text("Wave " + wave);
     this.$waveMsg.find('h2').text("Are you ready?");
     this.$waveMsg.fadeIn();
@@ -132,25 +147,26 @@ class PlayState extends State {
       Game.removeChild(row);
     }
 
+    for (let bullet of this.bullets) {
+      bullet.kill();
+    }
+
     this.enemies = [];
     this.enemyRows = [];
 
-    for (let i = 0; i < 4; i++) {
-      let enemyRow = new EnemyRow(this, 8);
-      enemyRow.x = Game.width/2;
-      enemyRow.y = 50 + 50*i;
-      this.enemyRows.push(enemyRow);
-      Game.addChild(enemyRow);
-    }
-
-    this.enemyShootCheck();
-
-    this.player.set(this.respawnPoint);
+    // this.player.set(this.respawnPoint);
 
     setTimeout(()=>{
       this.$waveMsg.fadeOut();
       this.paused = false;
-      this.wonWave = false;
+
+      for (let i = 0; i < 4; i++) {
+        setTimeout(()=>{
+          console.log("timeout" + i);
+          this.wonWave = false;
+          this.spawnEnemyRow(i);
+        }, 1000 + 300*i);
+      }
     }, 2000);
   }
 
@@ -161,14 +177,24 @@ class PlayState extends State {
     this.enemies = [];
     this.enemyRows = [];
 
-    for (let bullet of this.bullets) {
-      bullet.kill();
-    }
-
     setTimeout(()=>{
-      this.paused = true;
+      // this.paused = true;
       this.startWave(this.currentWave);
     }, 1000);
+  }
+
+  spawnEnemyRow(rowNumber: number) {
+    let enemyRow = new EnemyRow(this, 8);
+    enemyRow.x = Game.width/2;
+    enemyRow.y = 100 + 40*rowNumber;
+    enemyRow.alpha = 0;
+    createjs.Tween.get(enemyRow)
+      .to({ alpha: 1 }, 500);
+
+    this.enemyRows.push(enemyRow);
+    Game.addChild(enemyRow);
+
+    this.enemyShootCheck();
   }
 
   addEnemy(enemy: Enemy) {
@@ -176,7 +202,12 @@ class PlayState extends State {
     Game.addChild(enemy);
   }
 
-  removeEnemy(enemy: Enemy) {
+  killEnemy(enemy: Enemy) {
+    this.comboCounter++;
+    this.comboCooldown = 2;
+
+    this.score += Util.calculateComboPoints(this.comboCounter, enemy.baseScore);
+
     this.enemies = this.enemies.filter(e => e != enemy);
   }
 
@@ -200,7 +231,6 @@ class PlayState extends State {
 
       if (this.player.collides(enemy) && this.player.hit(1)) {
         enemy.kill();
-        this.removeEnemy(enemy);
 
         if (!this.player.alive) {
           Game.removeChild(this.player);
@@ -217,8 +247,6 @@ class PlayState extends State {
 
           if (enemy.collides(bullet)) {
             if (enemy.hit(bullet.damage)) {
-              if (!enemy.alive) this.removeEnemy(enemy);
-
               bullet.kill();
             }
           }
@@ -240,6 +268,10 @@ class PlayState extends State {
    Basically, only those enemies can shoot that don't have any enemies below.
   */
   enemyShootCheck() {
+    for (let enemy of this.enemies) {
+      enemy.shootEnabled = false;
+    }
+
     for (let c = 0; c < this.enemyColumns; c++) {
       for (let i = this.enemyRows.length-1; i >= 0; i--) {
         let enemy = <Enemy> this.enemyRows[i].getChildAt(c);

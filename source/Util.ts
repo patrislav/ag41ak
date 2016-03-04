@@ -56,3 +56,14 @@ export function computeVelocity(velocity: number, acceleration: number, drag: nu
 
   return velocity;
 }
+
+/*
+  Score awarding idea?
+    1     => 1x
+    2-4   => 2x
+    5-10  => 3x
+    11-17 => 4x
+*/
+export function calculateComboPoints(comboCounter: number, baseScore: number): number {
+  return baseScore * comboCounter;
+}

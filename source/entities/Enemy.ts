@@ -13,9 +13,11 @@ class Enemy extends Entity {
   state: PlayState;
   bitmap: createjs.Bitmap;
   row: EnemyRow;
-  shootEnabled: boolean;
 
+  shootEnabled: boolean;
   shootCooldown: number = Util.randomFloat(1, 5);
+
+  baseScore: number;
 
   constructor(state: PlayState, x?: number, y?: number) {
     super(state);
@@ -30,6 +32,7 @@ class Enemy extends Entity {
 
     this.health = 2;
     this.shootEnabled = false;
+    this.baseScore = 10;
 
     this.enableUpdate();
   }
@@ -65,6 +68,7 @@ class Enemy extends Entity {
 
   kill() {
     super.kill();
+    this.state.killEnemy(this);
     this.state.enemyShootCheck();
 
     createjs.Sound.play("boom-1", { volume: 1 });

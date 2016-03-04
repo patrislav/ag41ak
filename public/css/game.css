@@ -68,6 +68,21 @@
   box-shadow: 1px -1px #E8561C;
 }
 
+/* Score */
+.game-ui-state-play .game-play-score {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 7px;
+  background-color: #ccc;
+  color: #111;
+  border-top-left-radius: 5px;
+  border-top: 3px solid #111;
+  border-left: 3px solid #111;
+  box-shadow: -1px -1px #E8561C;
+}
+
+
 /* Wave message */
 .game-ui-state-play .game-play-wavemsg h1 {
   position: absolute;

@@ -18,6 +18,8 @@ class Player extends Entity {
   shootCooldown = 0;
   invulnCooldown = 0;
 
+  respawning = true;
+
   constructor(state: PlayState) {
     super(state);
     this.bitmap = new createjs.Bitmap(Game.assets['player']);
@@ -78,7 +80,7 @@ class Player extends Entity {
     }
 
     if (Game.anyPressed([32])) { // 32 - space
-      if (this.shootCooldown <= 0 && !this.invulnerable) {
+      if (this.shootCooldown <= 0 && !this.respawning) {
         let bullet = this.state.recyclePlayerBullet();
         if (bullet) {
           bullet.reset();
@@ -113,6 +115,7 @@ class Player extends Entity {
     if (res && this.alive) {
       this.visible = false;
       this.invulnerable = true;
+      this.respawning = true;
       this.invulnCooldown = Player.INVULN_TIME + Player.RESPAWN_TIME;
 
       createjs.Sound.play("hurt-1", { volume: 1 });
@@ -120,6 +123,7 @@ class Player extends Entity {
       setTimeout(()=> {
         this.set(this.state.respawnPoint);
         this.visible = true;
+        this.respawning = false;
         this.invulnerabilityEffect();
       }, Player.RESPAWN_TIME * 1000);
     }
