@@ -12,6 +12,14 @@ export class Vector2 {
   }
 }
 
+export function getUrl(path?: string) {
+  let url = window.location.href.substring(0, window.location.href.lastIndexOf("/")+1);
+  if (path) {
+    url += path;
+  }
+  return url;
+}
+
 export function randomFloat(min: number, max: number): number {
   return Math.random()*(max-min+1)+min;
 }

@@ -1,6 +1,7 @@
 
 import $ = require('jquery');
 import State = require('../State');
+import Util = require('../Util');
 import Game = require('../Game');
 
 class PreloadState extends State {
@@ -16,7 +17,7 @@ class PreloadState extends State {
   enter(): void {
     let that = this;
 
-    this.loadQueue.loadManifest("../../../assets/manifest.json");
+    this.loadQueue.loadManifest(Util.getUrl("assets/manifest.json"));
     this.loadQueue.on("complete", ()=>(that.handleComplete()));
     createjs.Sound.alternateExtensions = ["wav", "mp3"];
     this.loadQueue.installPlugin(<any>createjs.Sound);
