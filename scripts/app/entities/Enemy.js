@@ -10,6 +10,8 @@ define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'
         function Enemy(state, x, y) {
             _super.call(this, state);
             this.shootCooldown = Util.randomFloat(1, 5);
+            this.shootCooldownRange = new Util.Range(3, 12);
+            this.bulletSpeedRange = new Util.Range(150, 250);
             if (x)
                 this.x = x;
             if (y)
@@ -20,6 +22,7 @@ define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'
             this.addChild(this.bitmap);
             this.health = 2;
             this.shootEnabled = false;
+            this.baseScore = 10;
             this.enableUpdate();
         }
         Enemy.prototype.update = function (event) {
@@ -37,7 +40,8 @@ define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'
                         bullet = new EnemyBullet(this.state, this);
                         this.state.addBullet(bullet);
                     }
-                    this.shootCooldown = Util.randomFloat(3, 12);
+                    bullet.setSpeed(this.bulletSpeedRange.randomInteger());
+                    this.shootCooldown = this.shootCooldownRange.randomFloat();
                 }
             }
         };
@@ -47,6 +51,7 @@ define(["require", "exports", '../Entity', '../Game', '../Util', './EnemyBullet'
         };
         Enemy.prototype.kill = function () {
             _super.prototype.kill.call(this);
+            this.state.killEnemy(this);
             this.state.enemyShootCheck();
             createjs.Sound.play("boom-1", { volume: 1 });
         };

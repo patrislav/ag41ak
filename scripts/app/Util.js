@@ -14,6 +14,26 @@ define(["require", "exports"], function (require, exports) {
         return Vector2;
     }());
     exports.Vector2 = Vector2;
+    var Range = (function () {
+        function Range(min, max) {
+            if (min === void 0) { min = 0; }
+            if (max === void 0) { max = 0; }
+            this.min = min;
+            this.max = max;
+        }
+        Range.prototype.set = function (min, max) {
+            this.min = min;
+            this.max = max;
+        };
+        Range.prototype.randomFloat = function () {
+            return randomFloat(this.min, this.max);
+        };
+        Range.prototype.randomInteger = function () {
+            return randomInteger(this.min, this.max);
+        };
+        return Range;
+    }());
+    exports.Range = Range;
     function getUrl(path) {
         var url = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
         if (path) {
@@ -57,4 +77,8 @@ define(["require", "exports"], function (require, exports) {
         return velocity;
     }
     exports.computeVelocity = computeVelocity;
+    function calculateComboPoints(comboCounter, baseScore) {
+        return baseScore * comboCounter;
+    }
+    exports.calculateComboPoints = calculateComboPoints;
 });

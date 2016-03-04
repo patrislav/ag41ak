@@ -14,7 +14,6 @@ define(["require", "exports", '../State', '../Util', '../Game'], function (requi
         }
         PreloadState.prototype.enter = function () {
             var that = this;
-            console.log(Util.getUrl("assets/manifest.json"));
             this.loadQueue.loadManifest(Util.getUrl("assets/manifest.json"));
             this.loadQueue.on("complete", function () { return (that.handleComplete()); });
             createjs.Sound.alternateExtensions = ["wav", "mp3"];

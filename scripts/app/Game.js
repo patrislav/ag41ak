@@ -2,6 +2,7 @@ define(["require", "exports", 'underscore', "jquery", "easel", "tween", "sound",
     "use strict";
     exports.assets = {};
     exports.keys = {};
+    exports.lastScore = 0;
     var $soundButton;
     function setup(_canvas, _firstStateName) {
         if (!exports.states || exports.states.length == 0) {

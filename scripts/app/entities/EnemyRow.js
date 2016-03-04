@@ -3,12 +3,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define(["require", "exports", '../Entity', './Enemy', '../Game'], function (require, exports, Entity, Enemy, Game) {
+define(["require", "exports", '../Entity', './Enemy', '../Game', '../Util'], function (require, exports, Entity, Enemy, Game, Util) {
     "use strict";
     var EnemyRow = (function (_super) {
         __extends(EnemyRow, _super);
         function EnemyRow(state, numberOfEnemies) {
             _super.call(this, state);
+            this.shootCooldownRange = new Util.Range(3, 12);
+            this.bulletSpeedRange = new Util.Range(150, 250);
             this.state = state;
             this.initialCount = numberOfEnemies;
             this.enableUpdate();
@@ -20,6 +22,8 @@ define(["require", "exports", '../Entity', './Enemy', '../Game'], function (requ
                 enemy.x = enemy.regX + i * (enemy.getBounds().width + 10);
                 enemy.y = enemy.regY;
                 enemy.row = this;
+                enemy.shootCooldownRange = this.shootCooldownRange;
+                enemy.bulletSpeedRange = this.bulletSpeedRange;
                 this.addChild(enemy);
                 this.state.enemies.push(enemy);
             }
@@ -44,7 +48,7 @@ define(["require", "exports", '../Entity', './Enemy', '../Game'], function (requ
             }
             this.updateMotion(deltaTime);
         };
-        EnemyRow.SPEED = 50;
+        EnemyRow.SPEED = 40;
         return EnemyRow;
     }(Entity));
     return EnemyRow;

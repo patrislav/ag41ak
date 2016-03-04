@@ -3,7 +3,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '../Shared', '../entities/Player', '../entities/Enemy', '../entities/EnemyRow', '../entities/PlayerBullet', '../entities/EnemyBullet'], function (require, exports, $, _, State, Game, Shared, Player, Enemy, EnemyRow, PlayerBullet, EnemyBullet) {
+define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '../Util', '../Shared', '../entities/Player', '../entities/Enemy', '../entities/EnemyRow', '../entities/PlayerBullet', '../entities/EnemyBullet'], function (require, exports, $, _, State, Game, Util, Shared, Player, Enemy, EnemyRow, PlayerBullet, EnemyBullet) {
     "use strict";
     var PlayState = (function (_super) {
         __extends(PlayState, _super);
@@ -23,17 +23,16 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             var background = new createjs.Shape();
             background.graphics.beginFill("#DB7937").drawRect(0, 0, Game.width, Game.height);
             Game.stage.addChild(background);
+            this.respawnPoint = new createjs.Point(Game.width / 2, Game.height - 100);
             this.player = new Player(this);
-            this.player.x = Game.width / 2;
-            this.player.y = Game.height - 100;
+            this.player.set(this.respawnPoint);
             Game.addChild(this.player);
-            if (!Shared.themeMusic) {
-                Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
+            if (Shared.themeMusic) {
+                Shared.themeMusic.stop();
             }
-            createjs.Sound.play("start-1");
             this.$ui.show();
             this.currentWave = 1;
-            this.wonWave = false;
+            this.wonWave = true;
             this.startWave(this.currentWave);
         };
         PlayState.prototype.exit = function () {
@@ -43,55 +42,24 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             this.bullets = [];
             this.enemyRows = [];
             this.wonWave = false;
+            Game.lastScore = this.score;
+            this.score = 0;
             this.$ui.hide();
         };
         PlayState.prototype.update = function (event) {
-            this.$lives.find('span').text(this.player.health);
-            if (Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
-                Shared.themeMusic.play({ volume: 0.35, loop: -1 });
-            }
             var deltaTime = event.delta / 1000;
-            if (Game.anyPressed([8, 27])) {
-                Game.previousState();
-            }
-            for (var _i = 0, _a = this.enemies; _i < _a.length; _i++) {
-                var enemy = _a[_i];
-                if (!enemy.alive)
-                    continue;
-                if (this.collides(this.player, enemy) && this.player.hit(1)) {
-                    enemy.kill();
-                    this.removeEnemy(enemy);
-                    if (!this.player.alive) {
-                        Game.removeChild(this.player);
-                    }
-                }
-            }
-            for (var _b = 0, _c = this.bullets; _b < _c.length; _b++) {
-                var bullet = _c[_b];
-                if (bullet.shooter instanceof Player) {
-                    for (var _d = 0, _e = this.enemies; _d < _e.length; _d++) {
-                        var enemy = _e[_d];
-                        if (!enemy.alive)
-                            continue;
-                        if (this.collides(enemy, bullet)) {
-                            if (enemy.hit(bullet.damage)) {
-                                if (!enemy.alive)
-                                    this.removeEnemy(enemy);
-                                bullet.kill();
-                            }
-                        }
-                    }
-                }
-                else if (bullet.shooter instanceof Enemy) {
-                    if (this.collides(this.player, bullet)) {
-                        if (this.player.hit(bullet.damage)) {
-                            bullet.kill();
-                        }
-                    }
-                }
+            this.updateUI();
+            this.checkCollisions();
+            this.comboCooldown -= deltaTime;
+            if (this.comboCooldown < 0) {
+                this.comboCooldown = 0;
+                this.comboCounter = 0;
             }
             if (this.enemies.length == 0 && !this.wonWave) {
                 this.winWave();
+            }
+            if (Game.anyPressed([8, 27])) {
+                Game.previousState();
             }
         };
         PlayState.prototype.initUI = function () {
@@ -100,13 +68,22 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             this.$lives = $("<div/>").appendTo(this.$ui);
             this.$lives.html("Lives: <span></span>");
             this.$lives.addClass('game-play-lives');
+            this.$score = $("<div/>").appendTo(this.$ui);
+            this.$score.html("Score: <span></span>");
+            this.$score.addClass('game-play-score');
             this.$waveMsg = $("<div/>").appendTo(this.$ui);
             this.$waveMsg.addClass('game-play-wavemsg');
             $("<h1/>").appendTo(this.$waveMsg);
             $("<h2/>").appendTo(this.$waveMsg);
         };
+        PlayState.prototype.updateUI = function () {
+            this.$lives.find('span').text(this.player.health);
+            this.$score.find('span').text(this.score);
+        };
         PlayState.prototype.startWave = function (wave) {
             var _this = this;
+            this.comboCounter = 0;
+            this.comboCooldown = 0;
             this.$waveMsg.find('h1').text("Wave " + wave);
             this.$waveMsg.find('h2').text("Are you ready?");
             this.$waveMsg.fadeIn();
@@ -114,22 +91,25 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
                 var row = _a[_i];
                 Game.removeChild(row);
             }
+            for (var _b = 0, _c = this.bullets; _b < _c.length; _b++) {
+                var bullet = _c[_b];
+                bullet.kill();
+            }
             this.enemies = [];
             this.enemyRows = [];
-            for (var i = 0; i < 4; i++) {
-                var enemyRow = new EnemyRow(this, 8);
-                enemyRow.x = Game.width / 2;
-                enemyRow.y = 50 + 50 * i;
-                this.enemyRows.push(enemyRow);
-                Game.addChild(enemyRow);
-            }
-            this.enemyShootCheck();
-            this.player.x = Game.width / 2;
-            this.player.y = Game.height - 100;
             setTimeout(function () {
                 _this.$waveMsg.fadeOut();
                 _this.paused = false;
-                _this.wonWave = false;
+                var _loop_1 = function(i) {
+                    setTimeout(function () {
+                        console.log("timeout" + i);
+                        _this.wonWave = false;
+                        _this.spawnEnemyRow(i);
+                    }, 1000 + 300 * i);
+                };
+                for (var i = 0; i < 4; i++) {
+                    _loop_1(i);
+                }
             }, 2000);
         };
         PlayState.prototype.winWave = function () {
@@ -138,20 +118,40 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
             this.currentWave += 1;
             this.enemies = [];
             this.enemyRows = [];
-            for (var _i = 0, _a = this.bullets; _i < _a.length; _i++) {
-                var bullet = _a[_i];
-                bullet.kill();
-            }
             setTimeout(function () {
-                _this.paused = true;
                 _this.startWave(_this.currentWave);
             }, 1000);
+        };
+        PlayState.prototype.spawnEnemyRow = function (rowNumber) {
+            var enemyRow = new EnemyRow(this, 8);
+            enemyRow.x = Game.width / 2;
+            enemyRow.y = 100 + 40 * rowNumber;
+            var max = 15 - this.currentWave / 2;
+            if (max < 8)
+                max = 8;
+            enemyRow.shootCooldownRange = new Util.Range(3, max);
+            var min = 70 + (this.currentWave - 1) * 10;
+            if (min > 200)
+                min = 200;
+            max = 200 + (this.currentWave - 1) * 10;
+            if (max > 400)
+                max = 400;
+            enemyRow.bulletSpeedRange = new Util.Range(min, max);
+            enemyRow.alpha = 0;
+            createjs.Tween.get(enemyRow)
+                .to({ alpha: 1 }, 500);
+            this.enemyRows.push(enemyRow);
+            Game.addChild(enemyRow);
+            this.enemyShootCheck();
         };
         PlayState.prototype.addEnemy = function (enemy) {
             this.enemies.push(enemy);
             Game.addChild(enemy);
         };
-        PlayState.prototype.removeEnemy = function (enemy) {
+        PlayState.prototype.killEnemy = function (enemy) {
+            this.comboCounter++;
+            this.comboCooldown = 2;
+            this.score += Util.calculateComboPoints(this.comboCounter, enemy.baseScore);
             this.enemies = this.enemies.filter(function (e) { return e != enemy; });
         };
         PlayState.prototype.addBullet = function (bullet) {
@@ -164,7 +164,46 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
         PlayState.prototype.recycleEnemyBullet = function () {
             return _.find(this.bullets, function (b) { return b instanceof EnemyBullet && !b.alive; });
         };
+        PlayState.prototype.checkCollisions = function () {
+            for (var _i = 0, _a = this.enemies; _i < _a.length; _i++) {
+                var enemy = _a[_i];
+                if (!enemy.alive)
+                    continue;
+                if (this.player.collides(enemy) && this.player.hit(1)) {
+                    enemy.kill();
+                    if (!this.player.alive) {
+                        Game.removeChild(this.player);
+                    }
+                }
+            }
+            for (var _b = 0, _c = this.bullets; _b < _c.length; _b++) {
+                var bullet = _c[_b];
+                if (bullet.shooter instanceof Player) {
+                    for (var _d = 0, _e = this.enemies; _d < _e.length; _d++) {
+                        var enemy = _e[_d];
+                        if (!enemy.alive)
+                            continue;
+                        if (enemy.collides(bullet)) {
+                            if (enemy.hit(bullet.damage)) {
+                                bullet.kill();
+                            }
+                        }
+                    }
+                }
+                else if (bullet.shooter instanceof Enemy) {
+                    if (this.player.collides(bullet)) {
+                        if (this.player.hit(bullet.damage)) {
+                            bullet.kill();
+                        }
+                    }
+                }
+            }
+        };
         PlayState.prototype.enemyShootCheck = function () {
+            for (var _i = 0, _a = this.enemies; _i < _a.length; _i++) {
+                var enemy = _a[_i];
+                enemy.shootEnabled = false;
+            }
             for (var c = 0; c < this.enemyColumns; c++) {
                 for (var i = this.enemyRows.length - 1; i >= 0; i--) {
                     var enemy = this.enemyRows[i].getChildAt(c);
@@ -174,9 +213,6 @@ define(["require", "exports", 'jquery', 'underscore', '../State', '../Game', '..
                     }
                 }
             }
-        };
-        PlayState.prototype.collides = function (objA, objB) {
-            return objA.collides(objB);
         };
         return PlayState;
     }(State));

@@ -30,7 +30,9 @@ define(["require", "exports", './Bullet'], function (require, exports, Bullet) {
             this.x = position.x;
             this.y = position.y + 10;
         };
-        EnemyBullet.SPEED = 200;
+        EnemyBullet.prototype.setSpeed = function (speed) {
+            this.velocity.y = speed;
+        };
         EnemyBullet.RADIUS = 3;
         return EnemyBullet;
     }(Bullet));
