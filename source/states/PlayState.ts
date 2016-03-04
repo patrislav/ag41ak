@@ -18,6 +18,9 @@ class PlayState extends State {
   // Number of pixels between playable area and canvas border
   borderSize: number = 50;
 
+  // Player respawn point
+  respawnPoint: createjs.Point;
+
   player: Player;
   enemies: Enemy[] = [];
   enemyRows: EnemyRow[] = [];
@@ -49,9 +52,10 @@ class PlayState extends State {
     background.graphics.beginFill("#DB7937").drawRect(0, 0, Game.width, Game.height);
     Game.stage.addChild(background);
 
+    this.respawnPoint = new createjs.Point(Game.width/2, Game.height-100);
+
     this.player = new Player(this);
-    this.player.x = Game.width/2;
-    this.player.y = Game.height-100;
+    this.player.set(this.respawnPoint);
     Game.addChild(this.player);
 
     if (!Shared.themeMusic) {

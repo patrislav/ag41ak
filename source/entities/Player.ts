@@ -10,6 +10,7 @@ class Player extends Entity {
   static SPEEDY = 200; // px/second
   static SHOOT_COOLDOWN = 0.3; // seconds
   static INVULN_TIME = 4; // seconds
+  static RESPAWN_TIME = 2; // seconds
 
   bitmap: createjs.Bitmap;
   state: PlayState;
@@ -46,6 +47,7 @@ class Player extends Entity {
         this.shootCooldown = 0;
 
       this.handleInput();
+      this.handleBounds();
       this.updateMotion(deltaTime);
 
       if (this.invulnerable) {
@@ -93,14 +95,33 @@ class Player extends Entity {
     }
   }
 
+  handleBounds() {
+    // Zero the acceleration if out of playable area
+    let collider = this.getCollider();
+    if ((collider.x <= this.state.borderSize && this.acceleration.x < 0)
+    || (collider.x + collider.width >= Game.width - this.state.borderSize && this.acceleration.x > 0)) {
+      this.acceleration.x = 0;
+    }
+    if ((collider.y <= this.state.borderSize && this.acceleration.y < 0)
+    || (collider.y + collider.height >= Game.height - this.state.borderSize && this.acceleration.y > 0)) {
+      this.acceleration.y = 0;
+    }
+  }
+
   hit(damage: number): boolean {
     let res = super.hit(damage);
     if (res && this.alive) {
+      this.visible = false;
       this.invulnerable = true;
-      this.invulnCooldown = Player.INVULN_TIME;
-      this.invulnerabilityEffect();
+      this.invulnCooldown = Player.INVULN_TIME + Player.RESPAWN_TIME;
 
       createjs.Sound.play("hurt-1", { volume: 1 });
+
+      setTimeout(()=> {
+        this.set(this.state.respawnPoint);
+        this.visible = true;
+        this.invulnerabilityEffect();
+      }, Player.RESPAWN_TIME * 1000);
     }
     return res;
   }
