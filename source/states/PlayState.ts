@@ -82,6 +82,9 @@ class PlayState extends State {
     this.enemyRows = [];
     this.wonWave = false;
 
+    Game.lastScore = this.score;
+    this.score = 0;
+
     this.$ui.hide();
   }
 

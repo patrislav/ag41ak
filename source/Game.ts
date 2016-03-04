@@ -26,6 +26,8 @@ export let assets: Object = {};
 
 export let keys: Object = {};
 
+export let lastScore: number = 0;
+
 let $soundButton: JQuery;
 
 // Public functions

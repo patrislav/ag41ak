@@ -28,6 +28,7 @@
     "source/Main.ts",
     "source/Shared.ts",
     "source/State.ts",
+    "source/states/GameOverState.ts",
     "source/states/MenuState.ts",
     "source/states/PlayState.ts",
     "source/states/PreloadState.ts",

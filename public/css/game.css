@@ -112,6 +112,42 @@
   letter-spacing: 3px;
 }
 
+/* "Your score */
+.game-ui-state-gameover h3 {
+  position: absolute;
+  width: 100%;
+  top: 100px;
+  text-align: center;
+  font-weight: normal;
+  font-size: 3rem;
+  font-weight: normal;
+}
+
+/* Score */
+.game-ui-state-gameover h1 {
+  position: absolute;
+  width: 100%;
+  top: 150px;
+  text-align: center;
+
+  color: #ccc;
+  text-shadow: 5px 4px #111;
+
+  font-size: 5rem;
+  font-weight: normal;
+
+  letter-spacing: 10px;
+}
+
+/* Subtitle */
+.game-ui-state-gameover h2 {
+  position: absolute;
+  width: 100%;
+  top: 350px;
+  text-align: center;
+  font-weight: normal;
+}
+
 .game-ui kbd {
   font-family: inherit;
   font-size: 1em;

@@ -135,6 +135,10 @@ class Player extends Entity {
 
     createjs.Sound.play("boom-2", { volume: 1 });
     createjs.Sound.play("lose-1", { volume: 1, delay: 100 });
+
+    setTimeout(()=>{
+      Game.nextState();
+    }, 5000);
   }
 
   invulnerabilityEffect() {
