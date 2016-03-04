@@ -58,11 +58,10 @@ class PlayState extends State {
     this.player.set(this.respawnPoint);
     Game.addChild(this.player);
 
-    if (!Shared.themeMusic) {
-      Shared.themeMusic = createjs.Sound.play("theme-1", { volume: 0.35, loop: -1 });
+    if (Shared.themeMusic) {
+      Shared.themeMusic.stop();
     }
 
-    createjs.Sound.play("start-1");
     this.$ui.show();
 
     this.currentWave = 1;
@@ -83,16 +82,9 @@ class PlayState extends State {
   }
 
   update(event: createjs.Event): void {
-    // $('.fps-number').text(Math.round(createjs.Ticker.getMeasuredFPS()));
-    // $('.lives-number').text(this.player.health);
-
-    this.$lives.find('span').text(this.player.health);
-
-    if(Shared.themeMusic.playState != createjs.Sound.PLAY_SUCCEEDED) {
-      Shared.themeMusic.play({ volume: 0.35, loop: -1 });
-    }
-
     let deltaTime = event.delta / 1000; // event.delta is in ms
+
+    this.updateUI();
 
     // Handle input
     // TODO: It should pause the game and show in-game menu, though
@@ -100,46 +92,7 @@ class PlayState extends State {
       Game.previousState();
     }
 
-    // Check if player hits an enemy
-    for(let enemy of this.enemies) {
-      if (!enemy.alive) continue;
-
-      if (this.collides(this.player, enemy) && this.player.hit(1)) {
-        enemy.kill();
-        this.removeEnemy(enemy);
-
-        if (!this.player.alive) {
-          Game.removeChild(this.player);
-        }
-      }
-    }
-
-    // Check all the bullets
-    for (let bullet of this.bullets) {
-      // Check if the Player shot down an Enemy
-      if (bullet.shooter instanceof Player) {
-        for (let enemy of this.enemies) {
-          if (!enemy.alive) continue;
-
-          if (this.collides(enemy, bullet)) {
-            if (enemy.hit(bullet.damage)) {
-              if (!enemy.alive) this.removeEnemy(enemy);
-
-              bullet.kill();
-            }
-          }
-        }
-      }
-      // Check if an Enemy shot down the Player
-      else if (bullet.shooter instanceof Enemy) {
-        if (this.collides(this.player, bullet)) {
-          if (this.player.hit(bullet.damage)) {
-            bullet.kill();
-          }
-        }
-      }
-    }
-
+    this.checkCollisions();
 
     // Check for wave win
     if (this.enemies.length == 0 && !this.wonWave) {
@@ -155,10 +108,19 @@ class PlayState extends State {
     this.$lives.html("Lives: <span></span>");
     this.$lives.addClass('game-play-lives');
 
+    this.$score = $("<div/>").appendTo(this.$ui);
+    this.$score.html("Score: <span></span>");
+    this.$score.addClass('game-play-score');
+
     this.$waveMsg = $("<div/>").appendTo(this.$ui);
     this.$waveMsg.addClass('game-play-wavemsg');
     $("<h1/>").appendTo(this.$waveMsg);
     $("<h2/>").appendTo(this.$waveMsg);
+  }
+
+  updateUI(): void {
+    this.$lives.find('span').text(this.player.health);
+    this.$score.find('span').text(this.score);
   }
 
   startWave(wave: number) {
@@ -183,8 +145,7 @@ class PlayState extends State {
 
     this.enemyShootCheck();
 
-    this.player.x = Game.width/2;
-    this.player.y = Game.height-100;
+    this.player.set(this.respawnPoint);
 
     setTimeout(()=>{
       this.$waveMsg.fadeOut();
@@ -232,6 +193,52 @@ class PlayState extends State {
     return <EnemyBullet> _.find(this.bullets, (b: EnemyBullet)=> b instanceof EnemyBullet && !b.alive );
   }
 
+  checkCollisions() {
+    // Check if player hits an enemy
+    for(let enemy of this.enemies) {
+      if (!enemy.alive) continue;
+
+      if (this.player.collides(enemy) && this.player.hit(1)) {
+        enemy.kill();
+        this.removeEnemy(enemy);
+
+        if (!this.player.alive) {
+          Game.removeChild(this.player);
+        }
+      }
+    }
+
+    // Check all the bullets
+    for (let bullet of this.bullets) {
+      // Check if the Player shot down an Enemy
+      if (bullet.shooter instanceof Player) {
+        for (let enemy of this.enemies) {
+          if (!enemy.alive) continue;
+
+          if (enemy.collides(bullet)) {
+            if (enemy.hit(bullet.damage)) {
+              if (!enemy.alive) this.removeEnemy(enemy);
+
+              bullet.kill();
+            }
+          }
+        }
+      }
+      // Check if an Enemy shot down the Player
+      else if (bullet.shooter instanceof Enemy) {
+        if (this.player.collides(bullet)) {
+          if (this.player.hit(bullet.damage)) {
+            bullet.kill();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   Enables shooting only for enemies that are in the first row in each column.
+   Basically, only those enemies can shoot that don't have any enemies below.
+  */
   enemyShootCheck() {
     for (let c = 0; c < this.enemyColumns; c++) {
       for (let i = this.enemyRows.length-1; i >= 0; i--) {
@@ -242,10 +249,6 @@ class PlayState extends State {
         }
       }
     }
-  }
-
-  collides(objA: Entity, objB: Entity): boolean {
-    return objA.collides(objB);
   }
 }
 

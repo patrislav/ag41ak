@@ -78,7 +78,7 @@ class Player extends Entity {
     }
 
     if (Game.anyPressed([32])) { // 32 - space
-      if (this.shootCooldown <= 0) {
+      if (this.shootCooldown <= 0 && !this.invulnerable) {
         let bullet = this.state.recyclePlayerBullet();
         if (bullet) {
           bullet.reset();
